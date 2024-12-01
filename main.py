@@ -59,8 +59,10 @@ class FaceRecognitionApp:
 
         # noinspection PyTypeChecker
         image_np = array(image)
-
-        encoding = face_recognition.face_encodings(image_np)[0]
+        face_encodings = face_recognition.face_encodings(image_np)
+        if not face_encodings:
+            return
+        encoding = face_encodings[0]
         self.__known_face_encodings.append(encoding)
         self.__known_face_names.append(name)
 
@@ -136,6 +138,7 @@ def main() -> None:
     database_fetcher = DatabaseFetcher(db_url=DB_PATH, firebase_credentials_path=KEY)
     missing_people = list(database_fetcher.fetch_all_missing_people())
     for missing_person in missing_people:
+        print(missing_person)
         app.load_known_face_with_url(image_url=missing_person["image"], name=missing_person["name"])
 
     app.run()
